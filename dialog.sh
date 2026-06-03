@@ -1,13 +1,7 @@
-#
-
-exit 0
-#
-
-
 disk_paths=()
 disk_vendors=()
 disks=()
-lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE="disk"')
+lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE=="disk"')
 
 while IFS= read -r line; do 
     read -ra disk <<< "$line"
