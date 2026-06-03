@@ -43,26 +43,26 @@ pacstrap -K /mnt "${packages}"
 genfstab -L /mnt > /mnt/etc/fstab
 
 arch-chroot /mnt \
-ln -sf /usr/share/zoneinfo/Europae/Moscow /etc/localtime &&\
-hwclock --systohc &&\
-echo arch > /etc/hostname &&\
-passwd &&\
-bootctl install &&\
-echo '''
+"ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
+hwclock --systohc && \
+echo arch > /etc/hostname && \
+passwd && \
+bootctl install --esp-path=/mnt/boot&& \
+echo ```
 default  arch.conf
 timeout  1
 console-mode max
 editor   no
-''' > /boot/loader/loader.conf &&\
+``` > /boot/loader/loader.conf && \
 echo ```
 title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
 options root="LABEL=ROOT" rw
-``` > /boot/loader/entries/arch.conf
+``` > /boot/loader/entries/arch.conf "
 
 umount -R /mnt
 
-dialog --title Reboot --msgbox "All done. Reboot now" 0 0
+#dialog --title Reboot --msgbox "All done. Reboot now" 0 0
 
-reboot
+#reboot
