@@ -1,25 +1,20 @@
-disk_paths=()
-disk_vendors=()
+#!/usr/bin/bash
+
+set -Eeuo pipefail
+trap 'echo "Error line $LINENO. Error code: $?" >&2' ERR 
+
 disks=()
 lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE=="disk"')
 
 while IFS= read -r line; do 
     read -ra disk <<< "$line"
-    disk_paths+=(${disk[0]})
-    disk_vendors+=(${disk[1]})
-    disks+=(${disk[@]})
+    disks+=("${disk[0]}") # path
+    disks+=("${disk[1]}") # vendor
 done <<< $lsblk_output
-
-echo "${disk_paths[@]}"
-echo "${disk_vendors[@]}"
-# exit 0
-
 
 disk=$(dialog --title "Disks" --menu "Select disk" 8 45 0 \
 "${disks[@]}" \
 2>&1 >/dev/tty)
-
-echo $disk
 
 dialog --title Warning --msgbox "${disk} disk will be formatted!" 0 0
 
@@ -43,11 +38,11 @@ pacstrap -K /mnt "${packages}"
 genfstab -L /mnt > /mnt/etc/fstab
 
 arch-chroot /mnt \
-"ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
 hwclock --systohc && \
 echo arch > /etc/hostname && \
 passwd && \
-bootctl install --esp-path=/mnt/boot&& \
+bootctl install --esp-path=/mnt/boot && \
 echo ```
 default  arch.conf
 timeout  1
@@ -59,7 +54,7 @@ title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
 options root="LABEL=ROOT" rw
-``` > /boot/loader/entries/arch.conf "
+``` > /boot/loader/entries/arch.conf 
 
 umount -R /mnt
 
