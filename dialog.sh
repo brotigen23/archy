@@ -7,6 +7,8 @@ mapfile -t pkg < ./pkg
 disks=()
 lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE=="disk"')
 
+ram_size=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+
 while IFS= read -r line; do 
     read -ra disk <<< "$line"
     disks+=("${disk[0]}") # path
@@ -22,7 +24,7 @@ dialog --title Warning --msgbox "${disk} disk will be formatted!" 0 0
 sfdisk $disk << EOF
 label: gpt
 size=500M, type=U, bootable
-size=4G, type=S
+size=${ram_size}K, type=S
 size=+, type=L
 EOF
 
@@ -43,9 +45,9 @@ arch-chroot /mnt bash -c \
 hwclock --systohc && \
 echo arch > /etc/hostname && \
 passwd && \
-bootctl install --esp-path=/boot && \
-cp ./loader.conf /boot/loader/loader.conf && \
-cp ./arch.conf /boot/loader/entries/arch.conf'
+bootctl install --esp-path=/boot && '
+
+cp -r ./loader/ /mnt/boot/
 
 umount -R /mnt
 
