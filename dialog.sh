@@ -30,10 +30,10 @@ mkswap "${disk}2" -L SWAP
 mkfs.ext4 "${disk}3" -L ROOT
 
 mount  "${disk}3" /mnt
-mount -mkdir "${disk}1" /mnt/boot
+mount --mkdir "${disk}1" /mnt/boot
 swapon "${disk}2"
 
-pacstrap -K /mnt "${packages}"
+pacstrap -K /mnt $(cat ./pgk)
 
 genfstab -L /mnt > /mnt/etc/fstab
 
