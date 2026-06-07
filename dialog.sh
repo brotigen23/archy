@@ -3,9 +3,7 @@
 set -Eeuo pipefail
 trap 'echo "Error line $LINENO. Error code: $?" >&2' ERR 
 
-pkg=$(cat ./pkg)
-echo $pkg
-exit 0
+mapfile -t pkg < ./pkg
 disks=()
 lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE=="disk"')
 
@@ -36,7 +34,7 @@ mount  "${disk}3" /mnt
 mount --mkdir "${disk}1" /mnt/boot
 swapon "${disk}2"
 
-pacstrap -K /mnt "$pkg"
+pacstrap -K /mnt "${pkg[@]}"
 
 genfstab -L /mnt > /mnt/etc/fstab
 
