@@ -7,7 +7,11 @@ mapfile -t pkg < ./pkg
 disks=()
 lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE=="disk"')
 
-ram_size=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+boot_size="500M"
+#ram_size=$(free -g | grep 'Mem:' | awk '{print $2}')K
+ram_size=$(grep MemTotal /proc/meminfo | awk '{print $2}')K
+root_size="+"
+
 
 while IFS= read -r line; do 
     read -ra disk <<< "$line"
@@ -19,13 +23,16 @@ disk=$(dialog --title "Disks" --menu "Select disk" 8 45 0 \
 "${disks[@]}" \
 2>&1 >/dev/tty)
 
-dialog --title Warning --msgbox "${disk} disk will be formatted!" 0 0
+# dialog --title Partition --msgbox \
+# "${disk} disk will be formatted with next partitions: \ \n
+# boot:${boot_size}\n \ 
+# swap:${ram_size}\nroot:${root_size}" 0 0
 
 sfdisk $disk << EOF
 label: gpt
-size=500M, type=U, bootable
-size=${ram_size}K, type=S
-size=+, type=L
+size="$boot_size", type=U, bootable
+size=${ram_size}, type=S
+size=$"root_size", type=L
 EOF
 
 mkfs.fat -F32 "${disk}1" -n BOOT
