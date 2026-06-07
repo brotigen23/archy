@@ -38,14 +38,14 @@ pacstrap -K /mnt "${pkg[@]}"
 
 genfstab -L /mnt > /mnt/etc/fstab
 
-arch-chroot /mnt \
-ln -sf /mnt/usr/share/zoneinfo/Europe/Moscow /mnt/etc/localtime && \
+arch-chroot /mnt bash -c \
+'ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
 hwclock --systohc && \
-echo arch > /mnt/etc/hostname && \
+echo arch > /etc/hostname && \
 passwd && \
-bootctl install --esp-path=/mnt/boot && \
-cp ./loader.conf /mnt/boot/loader/loader.conf && \
-cp ./arch.conf /mnt/boot/loader/entries/arch.conf 
+bootctl install --esp-path=/boot && \
+cp ./loader.conf /boot/loader/loader.conf && \
+cp ./arch.conf /boot/loader/entries/arch.conf'
 
 umount -R /mnt
 
