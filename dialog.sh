@@ -3,6 +3,9 @@
 set -Eeuo pipefail
 trap 'echo "Error line $LINENO. Error code: $?" >&2' ERR 
 
+pkg=$(cat ./pkg)
+echo $pkg
+exit 0
 disks=()
 lsblk_output=$(lsblk -o PATH,VENDOR -A -n -Q 'TYPE=="disk"')
 
@@ -33,14 +36,14 @@ mount  "${disk}3" /mnt
 mount --mkdir "${disk}1" /mnt/boot
 swapon "${disk}2"
 
-pacstrap -K /mnt $(cat ./pgk)
+pacstrap -K /mnt "$pkg"
 
 genfstab -L /mnt > /mnt/etc/fstab
 
 arch-chroot /mnt \
-ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
+ln -sf /mnt/usr/share/zoneinfo/Europe/Moscow /mnt/etc/localtime && \
 hwclock --systohc && \
-echo arch > /etc/hostname && \
+echo arch > /mnt/etc/hostname && \
 passwd && \
 bootctl install --esp-path=/mnt/boot && \
 cp ./loader.conf /mnt/boot/loader/loader.conf && \
