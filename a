@@ -1,7 +1,8 @@
 base
+base-devel
+git
 linux
 linux-firmware
-base-devel
-sudo
+neovim
 networkmanager
-vim
+sudo
