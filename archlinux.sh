@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# usage: `disks= ; read_disks disks`
+# https://wiki.archlinux.org/title/Installation_guide
 
 # Variables
 
@@ -40,12 +40,6 @@ read_disks(){
 create_partition(){
     # check if $1 exist
     # try run sfdisk --no-act
-    local disk=$1
-
-    local boot_size=$2
-    local swap_size=$3
-    local root_size=$4
-
     sfdisk $disk << EOF
     label: gpt
     size="$boot_size", type=U, bootable
@@ -71,7 +65,7 @@ mount_disk(){
 }
 
 # usage:
-# install_system $(cat pkg.txt) "Europe/Moscow"
+# install_system "$(cat pkg.txt)" "Europe/Moscow"
 install_system(){
     # TODO:
     # !check pkg string
@@ -79,24 +73,52 @@ install_system(){
     # !remove read ./pkg
     
     local packages=$1
-    local timezone=$2
-
+    
     # new lines breaks $(cat pkg)
     #mapfile -t pkg < ./pkg
     #"${pkg[@]}"
     pacstrap -K /mnt $packages
 
     genfstab -L /mnt > /mnt/etc/fstab
+}
 
+set_timezone(){
+    local timezone=$1
     arch-chroot /mnt bash -c \
     "ln -sf /usr/share/zoneinfo/$timezone /etc/localtime && \
-    hwclock --systohc && \
-    echo arch > /etc/hostname && \
-    passwd && \
-    bootctl install --esp-path=/boot && \
-    systemctl enable NetworkManager"
+    hwclock --systohc"
+}
 
-    cp -r ./conf/loader/ /mnt/boot/
+set_hostname(){
+    arch-chroot /mnt bash -c "echo arch > /etc/hostname"
+}
+
+install_bootloader(){
+    arch-chroot /mnt bash -c \
+    "bootctl install --esp-path=/boot && \
+    cp -r ./conf/loader/ /mnt/boot/"
+}
+
+# usage:
+# post_create_user user 1432
+root_passwd(){
+    local pass=$1
+    passwd --stdin <<< "$pass"
+}
+
+enable_system_servicies(){
+    arch-chroot /mnt bash -c \
+    "systemctl enable NetworkManager"
+}
+
+# usage:
+# post_create_user user 1432
+post_create_user(){
+    local user=$1
+    local pass=$2
+
+    useradd -mG wheel "$user"
+    passwd --stdin user <<< "$pass"
 }
 
 install_packages(){
@@ -104,3 +126,4 @@ install_packages(){
 
     arch-chroot /mnt pacman -S "$packages"
 }
+

@@ -1,3 +1,0 @@
-size="$boot_size", type=U, bootable
-size=, type=S
-size=+, type=L
