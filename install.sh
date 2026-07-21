@@ -33,8 +33,8 @@ set_hostname
 
 install_bootloader
 
-root_passwd 1432
+root_passwd 1234
 
 enable_system_servicies
 
-post_create_user "user" "1432"
+post_create_user user 1234
