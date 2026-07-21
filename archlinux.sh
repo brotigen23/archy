@@ -21,6 +21,9 @@ check_disk(){
     return 0
 }
 
+# usage:
+# disks=()
+# read_disds disks
 read_disks(){   
     local -n d=$1 # use nameref for indirection
 
@@ -32,11 +35,11 @@ read_disks(){
 
 }
 
-# usage: create_partition /dev/sda 500M 500M +
+# usage: 
+# create_partition /dev/sda 500M 500M +
 create_partition(){
     # check if $1 exist
     # try run sfdisk --no-act
-    return 0
     local disk=$1
 
     local boot_size=$2
@@ -67,12 +70,19 @@ mount_disk(){
     swapon "${disk}2"
 }
 
+# usage:
+# install_system $(cat pkg.txt) "Europe/Moscow"
 install_system(){
+    # TODO:
+    # !check pkg string
+    # !check timezone exists
+    # !remove read ./pkg
+    
     local packages=$1
     local timezone=$2
 
-    mapfile -t pkg < ./pkg
-    pacstrap -K /mnt "${pkg[@]}"
+    #mapfile -t pkg < ./pkg
+    pacstrap -K /mnt packages #"${pkg[@]}"
 
     genfstab -L /mnt > /mnt/etc/fstab
 
@@ -84,7 +94,7 @@ install_system(){
     bootctl install --esp-path=/boot && \
     systemctl enable NetworkManager"
 
-    cp -r ./loader/ /mnt/boot/
+    cp -r ./conf/loader/ /mnt/boot/
 }
 
 install_packages(){

@@ -25,7 +25,7 @@ make_fs $disk
 
 mount_disk $disk
 
-install_system $disk "Europe/Moscow"
+install_system $(cat ./conf/base.pkg) "Europe/Moscow"
 
 exit 0
 
