@@ -84,6 +84,7 @@ install_system(){
 
 set_timezone(){
     local timezone=$1
+    
     arch-chroot /mnt bash -c \
     "ln -sf /usr/share/zoneinfo/$timezone /etc/localtime && \
     hwclock --systohc"
@@ -103,7 +104,9 @@ install_bootloader(){
 # post_create_user user 1432
 root_passwd(){
     local pass=$1
-    passwd --stdin <<< "$pass"
+
+    arch-chroot /mnt bash -c \
+    "passwd --stdin <<< $pass"
 }
 
 enable_system_servicies(){
@@ -117,13 +120,7 @@ post_create_user(){
     local user=$1
     local pass=$2
 
-    useradd -mG wheel "$user"
-    passwd --stdin user <<< "$pass"
+    arch-chroot /mnt bash -c \
+    "useradd -mG wheel $user \
+    passwd --stdin user <<< $pass"
 }
-
-install_packages(){
-    local packages=$1
-
-    arch-chroot /mnt pacman -S "$packages"
-}
-
