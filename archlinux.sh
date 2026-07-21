@@ -95,8 +95,8 @@ set_hostname(){
 
 install_bootloader(){
     arch-chroot /mnt bash -c \
-    "bootctl install --esp-path=/boot && \
-    cp -r ./conf/loader/ /mnt/boot/"
+    "bootctl install --esp-path=/boot"
+    cp -r ./conf/loader/ /mnt/boot/
 }
 
 # usage:
