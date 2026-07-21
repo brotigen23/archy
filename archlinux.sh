@@ -81,8 +81,10 @@ install_system(){
     local packages=$1
     local timezone=$2
 
+    # new lines breaks $(cat pkg)
     #mapfile -t pkg < ./pkg
-    pacstrap -K /mnt packages #"${pkg[@]}"
+    #"${pkg[@]}"
+    pacstrap -K /mnt $packages
 
     genfstab -L /mnt > /mnt/etc/fstab
 
